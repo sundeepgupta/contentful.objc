@@ -355,8 +355,7 @@
         } else {
             NSAssert([relationshipTarget isKindOfClass:[CDAResource class]],
                      @"Relationship target ought to be a Resource.");
-        }
-        
+                
         relationships[relationshipName] = relationshipTarget;
     }];
     
