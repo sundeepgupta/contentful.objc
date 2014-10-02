@@ -333,34 +333,41 @@
 
 - (void)updatePersistedEntry:(id<CDAPersistedEntry>)persistedEntry withEntry:(CDAEntry *)entry {
     [super updatePersistedEntry:persistedEntry withEntry:entry];
-
+    
     NSMutableDictionary* relationships = [@{} mutableCopy];
-
+    
     [self enumerateRelationshipsForClass:persistedEntry.class usingBlock:^(NSString *relationshipName) {
+        NSRelationshipDescription* description = [self relationshipDescriptionForName:relationshipName entityClass:persistedEntry.class];
         NSDictionary* mappingForEntries = [super mappingForEntriesOfContentTypeWithIdentifier:entry.contentType.identifier];
         NSString* entryKeyPath = [[mappingForEntries allKeysForObject:relationshipName] firstObject];
-
+        
         if (!entryKeyPath) {
             return;
         }
-
+        
         id relationshipTarget = [entry valueForKeyPath:entryKeyPath];
-
+        
         if (!relationshipTarget) {
             return;
         }
-
+        
         if ([relationshipTarget isKindOfClass:[NSArray class]]) {
-            relationshipTarget = [NSSet setWithArray:relationshipTarget];
+            if (description.isOrdered) {
+                relationshipTarget = [NSOrderedSet orderedSetWithArray:relationshipTarget];
+            } else {
+                relationshipTarget = [NSSet setWithArray:relationshipTarget];
+            }
         } else {
             NSAssert([relationshipTarget isKindOfClass:[CDAResource class]],
                      @"Relationship target ought to be a Resource.");
-                
+        }
+        
         relationships[relationshipName] = relationshipTarget;
     }];
     
     self.relationshipsToResolve[entry.identifier] = [relationships copy];
 }
+
 
 #pragma mark - Core Data stack
 
