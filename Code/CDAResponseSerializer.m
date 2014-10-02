@@ -50,7 +50,7 @@
 
 #pragma mark -
 
--(BOOL)fetchContentTypesForJSONResponse:(id)JSONObject error:(NSError**)error {
+-(BOOL)fetchContentTypesForJSONResponse:(id)JSONObject error:(NSError* __autoreleasing *)error {
     NSArray* contentTypeIds = [self unknownContentTypesInResult:JSONObject];
     
     if (contentTypeIds.count > 0) {
@@ -87,12 +87,12 @@
 }
 
 -(NSArray*)fetchResources:(NSMutableArray*)unresolvedIds
-            withBatchSize:(NSInteger)batchSize
+            withBatchSize:(NSUInteger)batchSize
                fetchBlock:(CDAArray* (^)(NSDictionary* query))fetchBlock {
     NSMutableArray* batchedItems = [@[] mutableCopy];
     
     do {
-        NSInteger nextBatchLength = 0;
+        NSUInteger nextBatchLength = 0;
         
         if (unresolvedIds.count > batchSize) {
             nextBatchLength = batchSize;
@@ -118,7 +118,7 @@
 
 -(id)responseObjectForResponse:(NSURLResponse *)response
                           data:(NSData *)data
-                         error:(NSError **)error {
+                         error:(NSError * __autoreleasing *)error {
     id JSONObject = data.length > 0 ? [super responseObjectForResponse:response
                                                                   data:data
                                                                  error:error] : nil;

@@ -6,9 +6,10 @@
 //
 //
 
+@import MapKit;
+
 #import <ContentfulDeliveryAPI/CDAEntry.h>
 #import <ContentfulDeliveryAPI/CDAField.h>
-#import <MapKit/MapKit.h>
 
 #import "CDAFieldCell.h"
 
@@ -87,7 +88,9 @@
             }
             return;
             
-        default:
+        case CDAFieldTypeAsset:
+        case CDAFieldTypeEntry:
+        case CDAFieldTypeNone:
             return;
     }
     

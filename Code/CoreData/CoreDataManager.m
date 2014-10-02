@@ -6,10 +6,11 @@
 //
 //
 
+@import CoreData;
+
 #import <ContentfulDeliveryAPI/CDAAsset.h>
 #import <ContentfulDeliveryAPI/CDAContentType.h>
 #import <ContentfulDeliveryAPI/CDAEntry.h>
-#import <CoreData/CoreData.h>
 
 #import "CoreDataManager.h"
 
@@ -142,7 +143,7 @@
 
 - (NSArray *)fetchEntititiesOfClass:(Class)class
                   matchingPredicate:(NSString*)predicateString
-                              error:(NSError**)error
+                              error:(NSError* __autoreleasing *)error
 {
     NSFetchRequest *request = [self fetchRequestForEntititiesOfClass:class
                                                    matchingPredicate:predicateString];
@@ -281,15 +282,26 @@
     [super performSynchronizationWithSuccess:success failure:failure];
 }
 
+- (NSRelationshipDescription*)relationshipDescriptionForName:(NSString*)relationshipName
+                                                 entityClass:(Class)class {
+    NSEntityDescription* entityDescription = [NSEntityDescription entityForName:NSStringFromClass(class) inManagedObjectContext:self.managedObjectContext];
+    return entityDescription.relationshipsByName[relationshipName];
+}
+
 - (void)resolveRelationships {
     for (id<CDAPersistedEntry> entry in [self fetchEntriesFromDataStore]) {
         NSDictionary* relationships = self.relationshipsToResolve[entry.identifier];
         [relationships enumerateKeysAndObjectsUsingBlock:^(NSString* keyPath, id value, BOOL *s) {
-            if ([value isKindOfClass:[NSSet class]]) {
-                NSMutableSet* resolvedSet = [NSMutableSet new];
+            NSRelationshipDescription* description = [self relationshipDescriptionForName:keyPath entityClass:entry.class];
+
+            if ([value isKindOfClass:[NSOrderedSet class]] || [value isKindOfClass:[NSSet class]]) {
+                id resolvedSet = description.isOrdered ? [NSMutableOrderedSet new] : [NSMutableSet new];
 
                 for (CDAResource* resource in value) {
-                    [resolvedSet addObject:[self resolveResource:resource]];
+                    id resolvedResource = [self resolveResource:resource];
+                    if (resolvedResource) {
+                        [resolvedSet addObject:resolvedResource];
+                    }
                 }
 
                 value = resolvedSet;
@@ -367,7 +379,6 @@
     
     self.relationshipsToResolve[entry.identifier] = [relationships copy];
 }
-
 
 #pragma mark - Core Data stack
 

@@ -6,7 +6,7 @@
 //  Copyright (c) 2013 Boris Bügling. All rights reserved.
 //
 
-#import <MapKit/MapKit.h>
+@import MapKit;
 
 #import "UFOMapViewController.h"
 #import "UFOSighting.h"
@@ -57,7 +57,7 @@
 }
 
 -(void)nextTapped {
-    NSInteger currentIndex = [self.mapView.annotations indexOfObject:[[self.mapView selectedAnnotations] firstObject]];
+    NSUInteger currentIndex = [self.mapView.annotations indexOfObject:[[self.mapView selectedAnnotations] firstObject]];
     currentIndex++;
     
     if (currentIndex < self.mapView.annotations.count) {

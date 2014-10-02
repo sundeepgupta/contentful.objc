@@ -6,8 +6,9 @@
 //
 //
 
+@import MapKit;
+
 #import <ISO8601DateFormatter/ISO8601DateFormatter.h>
-#import <MapKit/MapKit.h>
 
 #import "CDAClient+Private.h"
 #import "CDAFieldValueTransformer.h"
@@ -128,8 +129,10 @@
                 }
                 return [value stringValue];
             }
-            
-        default:
+
+        case CDAFieldTypeAsset:
+        case CDAFieldTypeEntry:
+        case CDAFieldTypeNone:
             break;
     }
     
